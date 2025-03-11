@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Nutricional</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #f7fafc; padding: 20px; }
+        .container { max-width: 400px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        input, select, button { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        button { background: #3a6ea5; color: white; font-weight: bold; cursor: pointer; }
+        button:hover { background: #2c5282; }
+        .result { margin-top: 20px; font-size: 18px; font-weight: bold; color: #2c5282; text-align: left; background: #e3f2fd; padding: 15px; border-radius: 8px; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Calculadora de TMB</h2>
+        <label>Sexo:</label>
+        <select id="gender">
+            <option value="male">Masculino</option>
+            <option value="female">Feminino</option>
+        </select>
+        <label>Idade (anos):</label>
+        <input type="number" id="age" min="5" max="120" placeholder="Ex: 30">
+        <label>Peso (kg):</label>
+        <input type="number" id="weight" min="30" max="300" placeholder="Ex: 70">
+        <label>Altura (cm):</label>
+        <input type="number" id="height" min="100" max="250" placeholder="Ex: 175">
+        <label>Nível de Atividade:</label>
+        <select id="activity">
+            <option value="1.2">Sedentário</option>
+            <option value="1.375">Levemente Ativo</option>
+            <option value="1.55">Moderadamente Ativo</option>
+            <option value="1.725">Muito Ativo</option>
+            <option value="1.9">Extremamente Ativo</option>
+        </select>
+        <label>Objetivo:</label>
+        <select id="goal">
+            <option value="loss">Perda de Peso</option>
+            <option value="maintenance">Manutenção</option>
+            <option value="gain">Ganho de Massa</option>
+        </select>
+        <button onclick="calculateTMB()">Calcular</button>
+        <button onclick="resetForm()">Limpar</button>
+        <div class="result" id="result"></div>
+    </div>
+    <script>
+        function calculateTMB() {
+            const gender = document.getElementById('gender').value;
+            const age = parseInt(document.getElementById('age').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const activity = parseFloat(document.getElementById('activity').value);
+            const goal = document.getElementById('goal').value;
+            
+            if (!age || !weight || !height) {
+                document.getElementById('result').innerText = "Preencha todos os campos corretamente!";
+                return;
+            }
+            
+            let tmb = gender === 'male' 
+                ? (10 * weight) + (6.25 * height) - (5 * age) + 5
+                : (10 * weight) + (6.25 * height) - (5 * age) - 161;
+            let get = tmb * activity;
+            
+            let caloricTarget = goal === "loss" ? get - 500 : goal === "gain" ? get + 500 : get;
+            let protein = weight * 2;
+            let fats = caloricTarget * 0.25 / 9;
+            let carbs = (caloricTarget - (protein * 4) - (fats * 9)) / 4;
+            let waterIntake = weight * 0.035;
+            
+            document.getElementById('result').innerHTML = `
+                Sua Taxa Metabólica Basal (TMB) é <strong>${tmb.toFixed(2)}</strong> kcal/dia.<br>
+                Considerando seu nível de atividade, seu gasto energético total (GET) é <strong>${get.toFixed(2)}</strong> kcal/dia.<br><br>
+                Para atingir seu objetivo de <strong>${goal === 'loss' ? 'Perda de Peso' : goal === 'gain' ? 'Ganho de Massa' : 'Manutenção'}</strong>, seu consumo diário deve ser de aproximadamente <strong>${caloricTarget.toFixed(2)}</strong> kcal.<br><br>
+                Seus macronutrientes recomendados são:<br>
+                - <strong>Proteína:</strong> ${protein.toFixed(2)} g<br>
+                - <strong>Gorduras:</strong> ${fats.toFixed(2)} g<br>
+                - <strong>Carboidratos:</strong> ${carbs.toFixed(2)} g<br><br>
+                Não esqueça da hidratação! Sua ingestão ideal de água é de <strong>${waterIntake.toFixed(2)}</strong> L/dia.<br><br>
+                Siga @icaro.nutricao para mais dicas! 💪
+            `;
+        }
+        
+        function resetForm() {
+            document.getElementById('gender').value = "male";
+            document.getElementById('age').value = "";
+            document.getElementById('weight').value = "";
+            document.getElementById('height').value = "";
+            document.getElementById('activity').value = "1.2";
+            document.getElementById('goal').value = "maintenance";
+            document.getElementById('result').innerText = "";
+        }
+    </script>
+</body>
+</html>
